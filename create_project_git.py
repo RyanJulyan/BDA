@@ -22,16 +22,22 @@ import click
 ###################
 
 @click.command()
-@click.option('--project', 
+@click.option('--project', required=True, 
                     help='Name of project to create.')
+@click.option('--owner', default='RyanJulyan',
+                    help='Name of GitHub owner to use.')
+@click.option('--repo', default='Flask-BDA',
+                    help='Name of GitHub repository to use (must be linked to owner).')
+@click.option('--branch', default='main',
+                    help='Name of branch to use.')
 # @click.pass_context
-def cmd_create_project(project):
+def cmd_create_project(project, owner, repo, branch):
     """Generate a new project"""
 
-    create_project(project)
+    create_project(project, owner, repo, branch)
 
 
-def create_project(project_name):
+def create_project(project_name, owner = "RyanJulyan", repo = "Flask-BDA", branch="main"):
     """Generate a new project"""
 
     while True:
@@ -84,10 +90,7 @@ def create_project(project_name):
     ########################
     ########################
 
-    owner = "RyanJulyan"
-    repo = "Flask-BDA"
-
-    os.system('curl -L https://codeload.github.com/{}/{}/zip/main --ssl-no-revok -o {}.zip'.format(owner, repo, repo))
+    os.system('curl -L https://codeload.github.com/{}/{}/zip/{} --ssl-no-revok -o {}.zip'.format(owner, repo, branch, repo))
 
     with zipfile.ZipFile(repo+'.zip', 'r') as zip_ref:
         zip_ref.extractall('./')
@@ -107,10 +110,10 @@ def create_project(project_name):
                     shutil.copy2(s, d)
 
 
-    copytree(repo+'-main/template', dir_name, 'Flask BDA', projectName)
-    copytree(repo+'-main/mobile_app', dir_name + "_mobile_app", 'Flask BDA', projectName)
+    copytree(repo+'-'+branch+'/template', dir_name, 'Flask BDA', projectName)
+    copytree(repo+'-'+branch+'/mobile_app', dir_name + "_mobile_app", 'Flask BDA', projectName)
 
-    shutil.rmtree(repo+'-main')
+    shutil.rmtree(repo+'-'+branch)
 
     os.remove(repo+'.zip')
 
